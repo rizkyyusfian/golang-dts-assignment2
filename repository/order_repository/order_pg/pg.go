@@ -132,3 +132,27 @@ func (orderPG *orderPG) CreateOrderWithItems(orderPayload entity.Order, itemPayl
 
 	return nil
 }
+
+func (orderPG *orderPG) DeleteOrder(orderId int) errs.Error {
+	tx, err := orderPG.db.Begin()
+
+	if err != nil {
+		return errs.NewInternalServerError("something went wrong")
+	}
+
+	_, err = tx.Exec(deleteOrderByIDQuery, orderId)
+
+	if err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong")
+	}
+
+	err = tx.Commit()
+
+	if err != nil {
+		tx.Rollback()
+		return errs.NewInternalServerError("something went wrong")
+	}
+
+	return nil
+}

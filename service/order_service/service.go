@@ -19,6 +19,7 @@ type Service interface {
 	CreateOrderWithItems(newOrderRequest dto.NewOrderRequestDto) (*dto.NewOrderResponseDto, errs.Error)
 	GetOrders() (*dto.GetOrdersResponseDto, errs.Error)
 	UpdateOrder(orderId int, newOrderRequest dto.NewOrderRequestDto) (*dto.NewOrderResponseDto, errs.Error)
+	DeleteOrder(orderId int) (*dto.NewOrderResponseDto, errs.Error)
 }
 
 func NewService(orderRepo order_repository.Repository, itemRepo item_repository.Repository) Service {
@@ -188,4 +189,21 @@ func (os *orderService) CreateOrderWithItems(newOrderRequest dto.NewOrderRequest
 
 	return &response, nil
 
+}
+
+func (os *orderService) DeleteOrder(orderId int) (*dto.NewOrderResponseDto, errs.Error) {
+	err := os.OrderRepo.DeleteOrder(orderId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	response := dto.NewOrderResponseDto{
+		BaseResponse: dto.BaseResponse{
+			StatusCode: http.StatusOK,
+			Message:    "order successfully deleted",
+		},
+	}
+
+	return &response, nil
 }
